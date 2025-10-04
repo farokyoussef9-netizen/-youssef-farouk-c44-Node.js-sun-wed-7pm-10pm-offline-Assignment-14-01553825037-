@@ -19,9 +19,9 @@ postSchema.virtual("comments",{
 });
 
 postSchema.pre("deleteOne",async function(next){
-    const filter=typeof this.getFilter()=="function"?this.getFilter():{};
-    console.log(filter)
+    const filter=typeof this.getFilter=="function"?this.getFilter():{};
+  
    await Comment.deleteMany({postid:filter._id})
-   console.log("deleted")
+ 
     next()
 })
