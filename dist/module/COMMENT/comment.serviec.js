@@ -13,6 +13,9 @@ class CommentService {
         const { postid, id } = req.params;
         const createcommentdto = req.body;
         const postexist = await this.postRepository.exist({ _id: postid });
+        if (postexist?.isDeleted == false) {
+            throw new utils_1.NotFoundException("post not found");
+        }
         if (!postexist) {
             throw new utils_1.NotFoundException("post not found");
         }
@@ -36,12 +39,15 @@ class CommentService {
         const commentexist = await this.commentRepository.exist({ _id: id }, {}, {
             populate: [{ path: "replies" }]
         });
+        if (commentexist?.isDeleted == false) {
+            throw new utils_1.NotFoundException("comment not found");
+        }
         if (!commentexist) {
             throw new utils_1.NotFoundException("comment not found");
         }
         return res.status(200).json({ message: "comment found", success: true, data: { commentexist } });
     };
-    deletecomment = async (req, res) => {
+    hard_deletecomment = async (req, res) => {
         const { id } = req.params;
         const commentexist = await this.commentRepository.exist({ _id: id }, {}, { populate: [{ path: "postid", select: "userid" }] });
         if (!commentexist) {
@@ -57,8 +63,44 @@ class CommentService {
         const { id } = req.params;
         const { reaction } = req.body;
         const userid = req.user?._id;
+        const commentexist = await this.commentRepository.exist({ _id: id }, {}, { populate: [{ path: "postid", select: "userid" }] });
+        if (commentexist?.isDeleted == false) {
+            throw new utils_1.NotFoundException("comment not found");
+        }
         await (0, providers_1.addreactionprovider)(this.commentRepository, id, reaction, userid, res);
         return res.sendStatus(204);
+    };
+    soft_deletecomment = async (req, res) => {
+        const { id } = req.params;
+        const commentexist = await this.commentRepository.exist({ _id: id }, {}, { populate: [{ path: "postid", select: "userid" }] });
+        if (!commentexist) {
+            throw new utils_1.NotFoundException("comment not found");
+        }
+        if (commentexist.userid.toString() != req.user?._id.toString() && commentexist.postid.userid.toString() != req.user?._id.toString()) {
+            throw new utils_1.UnauthorizedException("you are not authorized to delete this comment");
+        }
+        commentexist.isDeleted = true;
+        commentexist.deletedAT = new Date();
+        await this.commentRepository.update({ _id: id }, { isDeleted: true, deletedAT: new Date() });
+        return res.status(200).json({ message: "comment deleted successfully", success: true });
+    };
+    update_comment = async (req, res) => {
+        const { id } = req.params;
+        const newcontent = req.body;
+        const commentexist = await this.commentRepository.exist({ _id: id });
+        if (commentexist?.isDeleted == false) {
+            throw new utils_1.NotFoundException("comment not found");
+        }
+        if (!commentexist) {
+            throw new utils_1.NotFoundException("comment not found");
+        }
+        if (commentexist.userid.toString() != req.user?._id.toString() && commentexist.postid.userid.toString() != req.user?._id.toString()) {
+            throw new utils_1.UnauthorizedException("you are not authorized to delete this comment");
+        }
+        commentexist.content = newcontent;
+        const comment = this.commentFactory.updateComment(commentexist);
+        await this.commentRepository.update({ _id: id }, comment);
+        return res.status(200).json({ message: "comment updated successfully", success: true });
     };
 }
 exports.default = new CommentService();

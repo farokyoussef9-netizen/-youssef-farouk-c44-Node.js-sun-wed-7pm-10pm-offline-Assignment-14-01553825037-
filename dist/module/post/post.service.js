@@ -25,6 +25,10 @@ class PostService {
         const { id } = req.params;
         const { reaction } = req.body;
         const userid = req.user?._id;
+        const postexist = await this.postRebository.exist({ _id: id });
+        if (postexist?.isDeleted == false) {
+            throw new utils_1.NotFoundException("post not found");
+        }
         await (0, providers_1.addreactionprovider)(this.postRebository, id, reaction, userid, res);
         return res.sendStatus(204);
     };
@@ -38,7 +42,7 @@ class PostService {
         }
         return res.status(200).json({ message: "post found", success: true, data: { postexist } });
     };
-    delete_post = async (req, res) => {
+    hard_delete_post = async (req, res) => {
         const { id } = req.params;
         const postexist = await this.postRebository.exist({ _id: id });
         if (!postexist) {
@@ -49,6 +53,38 @@ class PostService {
         }
         await this.postRebository.delete({ _id: id });
         return res.status(200).json({ message: "post deleted successfully", success: true });
+    };
+    soft_delete_post = async (req, res) => {
+        const { id } = req.params;
+        const postexist = await this.postRebository.exist({ _id: id });
+        if (!postexist) {
+            throw new utils_1.NotFoundException("post not found");
+        }
+        if (postexist.userid.toString() != id) {
+            throw new utils_1.UnauthorizedException("you are not authorized to delete this post");
+        }
+        postexist.isDeleted = true;
+        postexist.deletedAT = new Date();
+        await this.postRebository.update({ _id: id }, { isDeleted: true, deletedAT: new Date() });
+        return res.status(200).json({ message: "post deleted successfully", success: true });
+    };
+    update_post = async (req, res) => {
+        const { id } = req.params;
+        const newcontent = req.body;
+        const postexist = await this.postRebository.exist({ _id: id });
+        if (postexist?.isDeleted == false) {
+            throw new utils_1.NotFoundException("post not found");
+        }
+        if (!postexist) {
+            throw new utils_1.NotFoundException("post not found");
+        }
+        if (postexist.userid.toString() != id) {
+            throw new utils_1.UnauthorizedException("you are not authorized to delete this post");
+        }
+        postexist.content = newcontent;
+        const post = this.postFactory.updatePost(postexist, req.user);
+        await this.postRebository.update({ _id: id }, post);
+        return res.status(200).json({ message: "post updated successfully", success: true });
     };
 }
 exports.PostService = PostService;

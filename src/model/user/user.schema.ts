@@ -22,6 +22,8 @@ export const userschema=new Schema<IUser>({
     Otp:{type:String},
     OtpExpiry:{type:Date},
     isVerified:{type:Boolean,default:false},
+    friends:[{type:Schema.Types.ObjectId,ref:"User"}],
+    requests:[{type:Schema.Types.ObjectId,ref:"User"}],
 },{timestamps:true,toJSON:{virtuals:true},toObject:{virtuals:true}}  )  
 userschema.virtual("fullname").get(function (){
     return this.firstname+" "+this.lastname;

@@ -8,6 +8,7 @@ const user_Rebository_1 = require("../../model/user/user.Rebository");
 const Factory_1 = require("./Factory");
 const Token_1 = require("../../utils/Token");
 const auth_provider_1 = __importDefault(require("./provider/auth.provider"));
+const email_1 = require("../../utils/email");
 class AuthService {
     userRebository = new user_Rebository_1.UserRebository();
     authFactory = new Factory_1.AUTHFactory();
@@ -24,6 +25,17 @@ class AuthService {
         // save into DB
         const userCreated = await this.userRebository.create(user); // send user to create method (after prepare data) not registerDto (from req.body)
         // send response
+        const otp = (0, utils_1.generateOTP)();
+        const otpExpiry = (0, utils_1.generateExpiryDate)(60 * 60 * 1000);
+        if (user.email) {
+            await (0, email_1.sendEmail)({
+                to: user.email,
+                subject: "Verify your account",
+                text: `Please verify your account by clicking on the link ${otp}`,
+            });
+        }
+        user.Otp = otp;
+        user.OtpExpiry = otpExpiry;
         return res.status(201).json({
             message: "user created successfuly",
             success: true,
@@ -42,12 +54,57 @@ class AuthService {
         if (!userexist) {
             throw new utils_1.forbeddibnException("Invalid email");
         }
+        if (userexist.isVerified == false) {
+            throw new utils_1.forbeddibnException("Please verify your account");
+        }
         if (!(await (0, utils_1.comparepassword)(loginDto.password, userexist.password))) {
             throw new utils_1.forbeddibnException("Invalid password");
         }
         //generateToken
         const acsesstoken = (0, Token_1.generateToken)({ payload: { _id: userexist._id, role: userexist.role }, options: { expiresIn: "1d" } });
         res.status(201).json({ message: "Login successfully", success: true, data: { acsesstoken } });
+    };
+    updatePassword = async (req, res, next) => {
+        const updatePasswordDto = req.body;
+        const userexist = await this.userRebository.exist({ email: updatePasswordDto.email });
+        if (!userexist) {
+            throw new utils_1.NotFoundException("Invalid email");
+        }
+        if (!(await (0, utils_1.comparepassword)(updatePasswordDto.password, userexist.password))) {
+            throw new utils_1.BadRequestException("Invalid password");
+        }
+        userexist.password = await (0, utils_1.generatehashPassword)(updatePasswordDto.newPassword);
+        await this.userRebository.update({ email: updatePasswordDto.email }, { password: userexist.password });
+        console.log(updatePasswordDto.password, userexist.password);
+        console.log(updatePasswordDto.newPassword, userexist.password);
+        res.status(201).json({ message: "Password updated successfully", success: true });
+    };
+    updateemail = async (req, res, next) => {
+        const updateemailDto = req.body;
+        const userexist = await this.userRebository.exist({ email: updateemailDto.email });
+        if (!userexist) {
+            throw new utils_1.NotFoundException("Invalid email");
+        }
+        if (!(await (0, utils_1.comparepassword)(updateemailDto.password, userexist.password))) {
+            throw new utils_1.BadRequestException("Invalid password");
+        }
+        userexist.email = updateemailDto.newEmail;
+        await this.userRebository.update({ email: updateemailDto.email }, { email: userexist.email });
+        res.status(201).json({ message: "Email updated successfully", success: true });
+    };
+    updatebasic = async (req, res, next) => {
+        const updatebasicDto = req.body;
+        const userexist = await this.userRebository.exist({ email: updatebasicDto.email });
+        if (!userexist) {
+            throw new utils_1.NotFoundException("Invalid email");
+        }
+        if (!(await (0, utils_1.comparepassword)(updatebasicDto.password, userexist.password))) {
+            throw new utils_1.BadRequestException("Invalid password");
+        }
+        userexist.fullname = updatebasicDto.newfullname;
+        userexist.phone = updatebasicDto.newphone;
+        await this.userRebository.update({ email: updatebasicDto.email }, { fullname: userexist.fullname, phone: userexist.phone });
+        res.status(201).json({ message: "Email updated successfully", success: true });
     };
 }
 exports.default = new AuthService();

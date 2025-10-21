@@ -6,7 +6,9 @@ import { AttachmentsSchema } from "../../DB/common.DB"
     postid:{type:Schema.Types.ObjectId,ref:"Post",required:true},
     parentid:{type:Schema.Types.ObjectId,ref:"Comment"},
     attachments:{type:[AttachmentsSchema]},
-    content:{type:String,required:true}
+    content:{type:String,required:true},
+    isDeleted:{type:Boolean,default:false},
+    deletedAT:{type:Date}
 },{timestamps:true, toJSON:{virtuals:true},toObject:{virtuals:true}})
 commentSchema.virtual("replies",{
     ref:"Comment",

@@ -17,6 +17,7 @@ export const isvalid=(schema:ZodType)=>{
         }));
         throw new BadRequestException("validation error",errmessages);
     }
-   return next();
+  
+ next();
 }
 }

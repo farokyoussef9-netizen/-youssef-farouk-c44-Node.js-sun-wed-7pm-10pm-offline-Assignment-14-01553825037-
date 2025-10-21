@@ -17,7 +17,7 @@ const isvalid = (schema) => {
             }));
             throw new ERROR_1.BadRequestException("validation error", errmessages);
         }
-        return next();
+        next();
     };
 };
 exports.isvalid = isvalid;

@@ -19,4 +19,21 @@ export interface LoginDto{
     email:string;
     password:string;
 }
+export interface UpdatePasswordDto{
+    email:string;
+    password:string;
+    newPassword:string;
+}
+export interface UpdateEmailDto{
+    email:string;
+    password:string;
+    newEmail:string;
+}
 
+export interface UpdatebasicDto{
+    email:string;
+    password:string;
+   newfullname?:string;
+   newphone?:string;
+   
+}

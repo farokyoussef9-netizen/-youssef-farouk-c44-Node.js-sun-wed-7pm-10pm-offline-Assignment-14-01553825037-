@@ -14,5 +14,15 @@ class CommentFactory {
         newcomment.reactions = [];
         return newcomment;
     }
+    updateComment(comment) {
+        const newcomment = new entity_1.COMMENT();
+        newcomment.userid = comment.userid;
+        newcomment.postid = comment.postid;
+        newcomment.content = comment.content;
+        newcomment.parentid = comment.parentid;
+        newcomment.attachments = comment.attachments;
+        newcomment.reactions = comment.reactions;
+        return newcomment;
+    }
 }
 exports.CommentFactory = CommentFactory;

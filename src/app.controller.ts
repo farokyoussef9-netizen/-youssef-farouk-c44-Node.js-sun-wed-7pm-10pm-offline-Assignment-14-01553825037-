@@ -3,8 +3,10 @@
     import { connectDB } from "./DB";
     import { AppError } from "./utils";
     import { NextFunction, Request, Response } from "express";
+    import cors from "cors";
     export function bootstrap(app:Express,express:any){
         app.use(express.json())
+        app.use(cors({origin:"*"}))
     app.use("/auth",authRouter);
     app.use("/user",userRouter);
     app.use("/post",postRouter);

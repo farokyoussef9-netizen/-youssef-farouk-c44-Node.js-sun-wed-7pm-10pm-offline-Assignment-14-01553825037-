@@ -8,7 +8,9 @@ exports.commentSchema = new mongoose_1.Schema({
     postid: { type: mongoose_1.Schema.Types.ObjectId, ref: "Post", required: true },
     parentid: { type: mongoose_1.Schema.Types.ObjectId, ref: "Comment" },
     attachments: { type: [common_DB_1.AttachmentsSchema] },
-    content: { type: String, required: true }
+    content: { type: String, required: true },
+    isDeleted: { type: Boolean, default: false },
+    deletedAT: { type: Date }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 exports.commentSchema.virtual("replies", {
     ref: "Comment",

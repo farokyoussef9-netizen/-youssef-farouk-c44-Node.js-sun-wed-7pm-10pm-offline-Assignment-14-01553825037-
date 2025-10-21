@@ -9,7 +9,9 @@ exports.postSchema = new mongoose_1.Schema({
     userid: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
     content: { type: String, required: true },
     reactions: { type: [common_DB_1.ReactionSchema] },
-    attachments: { type: [common_DB_2.AttachmentsSchema] } //imbeded document//document in document
+    attachments: { type: [common_DB_2.AttachmentsSchema] }, //imbeded document//document in document,
+    deletedAT: { type: Date },
+    isDeleted: { type: Boolean, default: false },
 }, { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } });
 exports.postSchema.virtual("comments", {
     localField: "_id",

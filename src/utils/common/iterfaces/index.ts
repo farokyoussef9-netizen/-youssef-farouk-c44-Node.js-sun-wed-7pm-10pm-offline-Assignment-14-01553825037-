@@ -2,7 +2,7 @@
 import { JwtPayload } from "jsonwebtoken";
 import {SYS_ROLE,GENDER,USER_AGENT, REACTION} from "../enum";
 import { Request } from "express";
-import { ObjectId } from "mongoose";
+import { ObjectId,Types } from "mongoose";
 export interface IAttachment{
     url:string;
     type:string;
@@ -21,6 +21,8 @@ userAgent: USER_AGENT;
 Otp?:string;
 OtpExpiry?:Date;
 isVerified?:boolean;
+friends?:ObjectId[];
+requests?:ObjectId[];
 }
 export interface IUser{
     _id:ObjectId;
@@ -35,7 +37,8 @@ export interface IPost{
     content:string;
    reactions:IReaction[];
    attachments?:IAttachment[];
-    
+isDeleted?:boolean;
+    deletedAT:Date;
 }
 export interface IComment{
     _id:ObjectId;
@@ -45,8 +48,19 @@ export interface IComment{
   parentid?:ObjectId|null;
   attachments?:IAttachment[];
   content:string;
+  isDeleted?:boolean;
+    deletedAT:Date;
 }
-
+export interface IMessage{
+    sender:ObjectId;
+    message:string;
+    attachments?:IAttachment[];
+    reactions:IReaction[];
+}
+export interface IChat {
+    users:ObjectId[];
+    messages:IMessage[];
+}
 declare module "jsonwebtoken"{
     interface JwtPayload{
         _id:string;

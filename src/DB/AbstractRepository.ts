@@ -1,5 +1,6 @@
 import { Model } from "mongoose";
 import { RootFilterQuery,ProjectionType,QueryOptions,UpdateQuery,MongooseUpdateQueryOptions } from "mongoose";
+import { Document } from "mongoose";
 //عملنها عشان لو غيرنا الداتا بيز نغير method هنا بس
 export default abstract class AbstractRepository<T>{
     constructor(protected model:Model<T>){
@@ -7,7 +8,7 @@ export default abstract class AbstractRepository<T>{
     async create(item:Partial<T>){
         //prebare data
         const doc= new this.model(item);
-        return await doc.save();
+        return await doc.save() as Document<T>;
     }
     async getone(filter:RootFilterQuery<T>,projection?:ProjectionType<T>,option?:QueryOptions<T>){
     return await this.model.findOne(filter,projection,option)

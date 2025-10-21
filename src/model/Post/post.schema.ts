@@ -10,7 +10,10 @@ export const postSchema=new Schema<IPost>({
     userid:{type:Schema.Types.ObjectId,ref:"User",required:true},
     content:{type:String,required:true},
     reactions:{type:[ReactionSchema]},
-   attachments:{type:[AttachmentsSchema]}//imbeded document//document in document
+   attachments:{type:[AttachmentsSchema]},//imbeded document//document in document,
+     deletedAT:{type:Date},
+  isDeleted:{type:Boolean,default:false},
+ 
 },{timestamps:true,toObject:{virtuals:true},toJSON:{virtuals:true}});
 postSchema.virtual("comments",{
     localField:"_id",

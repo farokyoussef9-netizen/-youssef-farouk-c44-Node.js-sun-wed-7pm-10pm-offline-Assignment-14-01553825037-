@@ -7,5 +7,6 @@ router.use("/:postid/comment",commentRouter)
 router.post("/",isAuthenticated(),postService.createPost)
 router.patch("/:id",isAuthenticated(),postService.addreaction)
 router.get("/:id",postService.get_post)
-router.delete("/:id",isAuthenticated(),postService.delete_post)
+router.delete("/:id",isAuthenticated(),postService.hard_delete_post)
+router.delete("/:id",isAuthenticated(),postService.soft_delete_post)
 export default router

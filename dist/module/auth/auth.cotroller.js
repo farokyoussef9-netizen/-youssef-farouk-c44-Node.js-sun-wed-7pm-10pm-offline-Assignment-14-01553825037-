@@ -11,5 +11,7 @@ const auth_middleware_1 = require("../../middleware/auth.middleware");
 const router = (0, express_1.Router)();
 router.post("/register", (0, middleware_1.isvalid)(auth_vaidation_1.registerSchema), auth_service_1.default.register);
 router.post("/verify", (0, auth_middleware_1.isAuthenticated)(), auth_service_1.default.verifyAccount);
+router.post("/update-password", (0, auth_middleware_1.isAuthenticated)(), auth_service_1.default.updatePassword);
 router.post("/login", auth_service_1.default.Login);
+router.post("/update-email", (0, auth_middleware_1.isAuthenticated)(), auth_service_1.default.updateemail);
 exports.default = router;

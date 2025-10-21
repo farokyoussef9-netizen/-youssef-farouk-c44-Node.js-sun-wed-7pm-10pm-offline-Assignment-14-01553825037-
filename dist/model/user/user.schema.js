@@ -23,6 +23,8 @@ exports.userschema = new mongoose_1.Schema({
     Otp: { type: String },
     OtpExpiry: { type: Date },
     isVerified: { type: Boolean, default: false },
+    friends: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
+    requests: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 exports.userschema.virtual("fullname").get(function () {
     return this.firstname + " " + this.lastname;

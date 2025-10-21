@@ -12,5 +12,6 @@ router.use("/:postid/comment", comment_controller_1.default);
 router.post("/", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.createPost);
 router.patch("/:id", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.addreaction);
 router.get("/:id", post_service_1.default.get_post);
-router.delete("/:id", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.delete_post);
+router.delete("/:id", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.hard_delete_post);
+router.delete("/:id", (0, auth_middleware_1.isAuthenticated)(), post_service_1.default.soft_delete_post);
 exports.default = router;
