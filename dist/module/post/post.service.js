@@ -8,13 +8,33 @@ const Post_Rebository_1 = require("../../model/Post/Post.Rebository");
 const utils_1 = require("../../utils");
 const factory_1 = __importDefault(require("./factory"));
 const providers_1 = require("../../utils/common/providers");
+const user_Rebository_1 = require("../../model/user/user.Rebository");
+const email_1 = require("../../utils/email");
 class PostService {
     postFactory = new factory_1.default();
     postRebository = new Post_Rebository_1.PostRebository();
+    userRebository = new user_Rebository_1.UserRebository();
     constructor() {
     }
     createPost = async (req, res) => {
         const postDto = req.body;
+        const allmentions = [];
+        if (postDto.mentions?.length) {
+            for (const userid of postDto.mentions) {
+                const userexist = await this.userRebository.exist({ _id: userid });
+                if (!userexist) {
+                    throw new utils_1.NotFoundException("user not found");
+                }
+                allmentions.push(userid);
+                //send email
+                const mailOptions = {
+                    to: userexist.email,
+                    subject: "New Mention",
+                    text: "You have been mentioned in a post"
+                };
+                await (0, email_1.sendEmail)(mailOptions);
+            }
+        }
         //factory(prepare data)
         const post = this.postFactory.createPost(postDto, req.user);
         //rebository(save into DB)

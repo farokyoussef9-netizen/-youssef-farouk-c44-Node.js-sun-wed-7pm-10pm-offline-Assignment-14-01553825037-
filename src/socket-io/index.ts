@@ -10,6 +10,17 @@ io.use(authMiddleware)
 io.on("connection",async(socket:Socket)=>{
    
     userconnections.set(socket.data.user.id, socket.id);
+    socket.on("join", (username) => {
+    io.emit("onlineUsers", Array.from(userconnections.values()));
+  });
+  socket.on("typing", (username) => {
+    socket.broadcast.emit("userTyping", username);
+  });
+
+  // stop typing event
+  socket.on("stopTyping", (username) => {
+    socket.broadcast.emit("userStopTyping", username);
+  });
     socket.on("sendMessage",async(data:{message:string,destid:string})=>{
         const destsocket=userconnections.get(data.destid);//.عشان ارجع اا socketid بتاعه
 socket.emit("successMessage",data);

@@ -23,4 +23,7 @@ return await this.model.updateOne(filter,update,option)
     async delete(filter:RootFilterQuery<T>){
 return await this.model.deleteOne(filter)
     }
+    async getall(filter:RootFilterQuery<T>,projection?:ProjectionType<T>,option?:QueryOptions<T>){
+        return await this.model.find(filter,projection,option)
+    }
 }

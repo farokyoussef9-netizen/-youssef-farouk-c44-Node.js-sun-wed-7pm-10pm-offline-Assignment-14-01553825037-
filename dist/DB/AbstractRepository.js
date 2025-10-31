@@ -23,5 +23,8 @@ class AbstractRepository {
     async delete(filter) {
         return await this.model.deleteOne(filter);
     }
+    async getall(filter, projection, option) {
+        return await this.model.find(filter, projection, option);
+    }
 }
 exports.default = AbstractRepository;

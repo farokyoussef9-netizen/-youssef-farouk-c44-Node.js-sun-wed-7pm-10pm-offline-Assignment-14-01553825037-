@@ -7,6 +7,8 @@ exports.bootstrap = bootstrap;
 const module_1 = require("./module");
 const DB_1 = require("./DB");
 const cors_1 = __importDefault(require("cors"));
+const express_1 = require("graphql-http/lib/use/express");
+const app_graphql_1 = require("./app.graphql");
 function bootstrap(app, express) {
     app.use(express.json());
     app.use((0, cors_1.default)({ origin: "*" }));
@@ -14,6 +16,19 @@ function bootstrap(app, express) {
     app.use("/user", module_1.userRouter);
     app.use("/post", module_1.postRouter);
     app.use("/comment", module_1.commentRouter);
+    app.all("/graphql", (0, express_1.createHandler)({ schema: app_graphql_1.schema, formatError: (error) => {
+            return {
+                message: error.message,
+                success: false,
+                path: error.path,
+                extensions: error.originalError,
+            };
+        }, context: (req) => {
+            const token = req.headers["authorization"];
+            return {
+                token
+            };
+        } }));
     app.use("/{*dummy}", (req, res, next) => {
         return res.status(404).json({ message: "invalid router", success: false });
     });
